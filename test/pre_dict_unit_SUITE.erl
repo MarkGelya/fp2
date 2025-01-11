@@ -112,11 +112,11 @@ delete_element_test(_) ->
 map_test(_) ->
     Dataset = get_dataset(),
     T4 = lists:nth(4, Dataset),
-    T4_new = pre_dict:map(fun({_, V}) -> V * 2 end, T4),
-    ?assertEqual(2, pre_dict:get("abc", T4_new)),
-    ?assertEqual(4, pre_dict:get("acb", T4_new)),
-    ?assertEqual(6, pre_dict:get("abcd", T4_new)),
-    ?assertEqual(8, pre_dict:get("ab", T4_new)).
+    T4new = pre_dict:map(fun({_, V}) -> V * 2 end, T4),
+    ?assertEqual(2, pre_dict:get("abc", T4new)),
+    ?assertEqual(4, pre_dict:get("acb", T4new)),
+    ?assertEqual(6, pre_dict:get("abcd", T4new)),
+    ?assertEqual(8, pre_dict:get("ab", T4new)).
 
 fold_test(_) ->
     Dataset = get_dataset(),
@@ -132,11 +132,11 @@ even(X) when X >= 0 ->
 filter_test(_) ->
     Dataset = get_dataset(),
     T4 = lists:nth(4, Dataset),
-    T4_new = pre_dict:filter(fun({_, V}) -> even(V) end, T4),
-    ?assertEqual(undefined, pre_dict:get("abc", T4_new)),
-    ?assertEqual(2, pre_dict:get("acb", T4_new)),
-    ?assertEqual(undefined, pre_dict:get("abcd", T4_new)),
-    ?assertEqual(4, pre_dict:get("ab", T4_new)).
+    T4new = pre_dict:filter(fun({_, V}) -> even(V) end, T4),
+    ?assertEqual(undefined, pre_dict:get("abc", T4new)),
+    ?assertEqual(2, pre_dict:get("acb", T4new)),
+    ?assertEqual(undefined, pre_dict:get("abcd", T4new)),
+    ?assertEqual(4, pre_dict:get("ab", T4new)).
 
 equal_test(_) ->
     Dataset = get_dataset(),

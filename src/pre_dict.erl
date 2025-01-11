@@ -117,10 +117,11 @@ to_list_impl(#pre_dict_node{children = Children,
              AccPath,
              Acc) ->
     NewAcc =
-        if Value =/= undefined ->
-               [{lists:reverse(AccPath), Value} | Acc];
-           true ->
-               Acc
+        case Value =/= undefined of
+            true ->
+                [{lists:reverse(AccPath), Value} | Acc];
+            false ->
+                Acc
         end,
     lists:foldl(fun({K, V}, AccIn) -> to_list_impl(V, [K | AccPath], AccIn) end,
                 NewAcc,
@@ -178,44 +179,41 @@ equal(Node1, Node2) ->
             false
     end.
 
-merge(Node1, Node2) ->
-    case Node2 of
-        #pre_dict_node{children = Children2,
-                       value = Value2,
-                       exists = Exists2} ->
-            MergedNode = merge_values(Node1, Value2, Exists2),
-            NewChildren =
-                lists:foldl(fun({Key, Child2}, Acc) ->
-                               case maps:find(Key, MergedNode#pre_dict_node.children) of
-                                   {ok, Child1} ->
-                                       NewChild = merge(Child1, Child2),
-                                       maps:put(Key, NewChild, Acc);
-                                   error ->
-                                       maps:put(Key, Child2, Acc)
-                               end
-                            end,
-                            MergedNode#pre_dict_node.children,
-                            maps:to_list(Children2)),
-            MergedNode#pre_dict_node{children = NewChildren}
-    end.
+merge(Node1,
+      #pre_dict_node{children = Children2,
+                     value = Value2,
+                     exists = Exists2}) ->
+    MergedNode = merge_values(Node1, Value2, Exists2),
+    NewChildren =
+        lists:foldl(fun({Key, Child2}, Acc) ->
+                       case maps:find(Key, MergedNode#pre_dict_node.children) of
+                           {ok, Child1} ->
+                               NewChild = merge(Child1, Child2),
+                               maps:put(Key, NewChild, Acc);
+                           error ->
+                               maps:put(Key, Child2, Acc)
+                       end
+                    end,
+                    MergedNode#pre_dict_node.children,
+                    maps:to_list(Children2)),
+    MergedNode#pre_dict_node{children = NewChildren}.
 
 merge_values(Node, Value2, Exists2) ->
-    case Node of
-        #pre_dict_node{value = Value1, exists = Exists1} ->
-            NewExists = Exists1 or Exists2,
-            NewValue =
-                case {Exists1, Exists2} of
-                    {true, true} ->
-                        Value1;
-                    {true, false} ->
-                        Value1;
-                    {false, true} ->
-                        Value2;
-                    {false, false} ->
-                        undefined
-                end,
-            Node#pre_dict_node{value = NewValue, exists = NewExists}
-    end.
+    Value1 = Node#pre_dict_node.value,
+    Exists1 = Node#pre_dict_node.exists,
+    NewExists = Exists1 or Exists2,
+    NewValue =
+        case {Exists1, Exists2} of
+            {true, true} ->
+                Value1;
+            {true, false} ->
+                Value1;
+            {false, true} ->
+                Value2;
+            {false, false} ->
+                undefined
+        end,
+    Node#pre_dict_node{value = NewValue, exists = NewExists}.
 
 % T0 = pre_dict:new().
 % T1 = pre_dict:insert("abc", 1, T0).
