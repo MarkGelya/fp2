@@ -6,8 +6,8 @@
 
 -export([all/0]).
 -export([new_pre_dict_test/1, add_element_test/1, get_element_test/1,
-         delete_element_test/1, map_test/1, fold_test/1, filter_test/1, equal_test/1,
-         merge_test/1]).
+         delete_element_test/1, map_test/1, fold_test/1, filter_test/1, equal_test/1, merge_test/1,
+         monoid1/1]).
 
 all() ->
     [add_element_test,
@@ -19,7 +19,8 @@ all() ->
      fold_test,
      filter_test,
      equal_test,
-     merge_test].
+     merge_test,
+     monoid1].
 
 get_new_pre_dict() ->
     {pre_dict_node, #{}, undefined, false}.
@@ -231,3 +232,10 @@ merge_test(_) ->
     T5 = pre_dict:insert("bc", 5, T4),
 
     ?assertEqual(true, pre_dict:equal(C0, T5)).
+
+monoid1(_) ->
+    E = pre_dict:new(),
+    Dataset = get_dataset(),
+    X = lists:nth(4, Dataset),
+    Xnew = pre_dict:merge(X, E),
+    ?assertEqual(true, pre_dict:equal(X, Xnew)).
